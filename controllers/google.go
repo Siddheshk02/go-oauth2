@@ -1,38 +1,48 @@
 package controllers
 
 import (
-	"log"
-	"os"
+	"context"
+	"io/ioutil"
+	"net/http"
 
+	"github.com/Siddheshk02/go-oauth2/config"
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 func GoogleLogin(c *fiber.Ctx) error {
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Some error occured. Err: %s", err)
-	}
-
-	var GoogleLoginConfig oauth2.Config = oauth2.Config{
-		RedirectURL:  "http://localhost:8080/google_callback",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		Scopes: []string{"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile"},
-		Endpoint: google.Endpoint,
-	}
-
-	url := GoogleLoginConfig.AuthCodeURL("randomstate")
+	url := config.AppConfig.GoogleLoginConfig.AuthCodeURL("randomstate")
 
 	c.Status(fiber.StatusSeeOther)
 	c.Redirect(url)
 	return c.JSON(url)
 }
 
-/*func GoogleCallback(c *fiber.Ctx) error {
+func GoogleCallback(c *fiber.Ctx) error {
+	state := c.Query("state")
+	if state != "randomstate" {
+		return c.SendString("States don't Match!!")
+	}
 
-}*/
+	code := c.Query("code")
+
+	googlecon := config.GoogleConfig()
+
+	token, err := googlecon.Exchange(context.Background(), code)
+	if err != nil {
+		return c.SendString("Code-Token Exchange Failed")
+	}
+
+	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
+	if err != nil {
+		return c.SendString("User Data Fetch Failed")
+	}
+
+	userData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return c.SendString("JSON Parsing Failed")
+	}
+
+	return c.SendString(string(userData))
+
+}
