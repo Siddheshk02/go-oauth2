@@ -40,9 +40,12 @@ func GithubConfig() oauth2.Config {
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
+
 	AppConfig.GitHubLoginConfig = oauth2.Config{
-		RedirectURL:  "http://localhost:8080/github_callback",
-		ClientID:     os.Getenv("GITHUB_CLIENT_ID"),
+		ClientID:    os.Getenv("GITHUB_CLIENT_ID"),
+		RedirectURL: "http://localhost:8080/github_callback",
+		//RedirectURL: fmt.Sprintf(
+		//	"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s", AppConfig.GitHubLoginConfig.ClientID, "http://localhost:8080/github_callback"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
 		Scopes:       []string{"name", "email", "repo"},
 		Endpoint:     github.Endpoint,

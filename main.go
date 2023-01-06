@@ -15,7 +15,7 @@ func main() {
 	app.Get("/google_login", controllers.GoogleLogin)
 	app.Get("/google_callback", controllers.GoogleCallback)
 	app.Get("/github_login", controllers.GithubLogin)
-	//app.Post("/github_callback", controllers.GithubCallback)
+	app.Get("/github_callback", controllers.GithubCallback)
 
 	app.Listen(":8080")
 
