@@ -42,12 +42,12 @@ func GithubConfig() oauth2.Config {
 	}
 
 	AppConfig.GitHubLoginConfig = oauth2.Config{
-		ClientID:    os.Getenv("GITHUB_CLIENT_ID"),
 		RedirectURL: "http://localhost:8080/github_callback",
+		ClientID:    os.Getenv("GITHUB_CLIENT_ID"),
 		//RedirectURL: fmt.Sprintf(
-		//	"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s", AppConfig.GitHubLoginConfig.ClientID, "http://localhost:8080/github_callback"),
+		//	"https://github.com/login/oauth/authorize?scope=user:repo&client_id=%s&redirect_uri=%s", os.Getenv("GITHUB_CLIENT_ID"), "http://localhost:8080/github_callback"),
 		ClientSecret: os.Getenv("GITHUB_CLIENT_SECRET"),
-		Scopes:       []string{"name", "email", "repo"},
+		Scopes:       []string{"user", "repo"},
 		Endpoint:     github.Endpoint,
 	}
 
